@@ -214,7 +214,7 @@ static void vcpu_insn_exec(unsigned int cpu_index, void *udata)
             length += sprintf(reg_scratch+length, "%s=%lX,", reg_name[i], g_cpu[i]);
 
     // Get the new instruction pointer
-    uint64_t rip = GPOINTER_TO_UINT(udata);
+    uint64_t rip = (uint64_t) udata;
     length += sprintf(reg_scratch+length, "RIP=%lX", rip);
 
     for (size_t i = 0; i < g_mem_log_count; i++)
