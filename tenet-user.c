@@ -48,7 +48,6 @@
 //    [...]
 
 #define CPUState_Size 33536
-#define FILTER_PATTERN "*target_binary"
 
 
 // X86_64-specific registers
@@ -106,6 +105,7 @@ void *qemu_map_ram_ptr(void *ram_block, uint64_t addr);
 
 // Address region filtering
 static GArray *log_regions = NULL;
+static const char *filter_pattern = "*";
 
 struct Range
 {
@@ -145,7 +145,7 @@ static void update_log_regions(void)
         if (!filename)
             continue;
 
-        if (!fnmatch(FILTER_PATTERN, filename, 0))
+        if (!fnmatch(filter_pattern, filename, FNM_EXTMATCH))
         {
             // Events in this entry shall be traced
             struct Range range;
@@ -301,10 +301,13 @@ QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id, const
 
     const char *filepath = NULL;
 
-    if (argc)
+    if (argc > 0)
         filepath = argv[0];
     else
         filepath = "trace.log";
+
+    if (argc > 1)
+        filter_pattern = argv[1];
 
     printf("Writing Tenet trace to %s\n", filepath);
     trace_file = fopen(filepath, "w");
